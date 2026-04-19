@@ -1038,3 +1038,34 @@ body {
         font-size: 64px;
     }
 }
+
+/* ── Tutor Screen Polishes ─────────────────────── */
+#next-sign-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--gold);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 12px;
+    padding: 15px 40px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+#next-sign-btn:hover {
+    background: var(--gold);
+    color: var(--black);
+    border-color: var(--gold);
+}
+
+.success-pulse {
+    animation: success-glow 0.8s ease-out;
+}
+
+@keyframes success-glow {
+    0% { box-shadow: 0 0 0 0 rgba(168, 230, 207, 0.4); transform: scale(1); }
+    50% { box-shadow: 0 0 40px 20px rgba(168, 230, 207, 0); transform: scale(1.02); }
+    100% { box-shadow: 0 0 0 0 rgba(168, 230, 207, 0); transform: scale(1); }
+}

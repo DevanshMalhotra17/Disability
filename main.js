@@ -41,6 +41,37 @@ document.body.addEventListener('click', (e) => {
     }
 });
 
+// Blind mode global shortcut: Long press anywhere for 2 seconds to auto-select Blind Mode
+let blindModeTimer;
+
+function startBlindModeTimer() {
+    // Only apply on the setup or identity screens
+    if (window.location.pathname.includes('live') || window.location.pathname.includes('learn')) return;
+    
+    blindModeTimer = setTimeout(() => {
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance("Blind mode activated. Proceeding to next screen.");
+            window.speechSynthesis.speak(utterance);
+        }
+        
+        localStorage.setItem('myId', 'blind');
+        window.location.href = 'identity2.html';
+    }, 2000);
+}
+
+function cancelBlindModeTimer() {
+    clearTimeout(blindModeTimer);
+}
+
+document.addEventListener('mousedown', startBlindModeTimer);
+document.addEventListener('mouseup', cancelBlindModeTimer);
+document.addEventListener('touchstart', startBlindModeTimer, {passive: true});
+document.addEventListener('touchend', cancelBlindModeTimer);
+document.addEventListener('touchcancel', cancelBlindModeTimer);
+
 // Identity 1 selection
 document.querySelectorAll('.id1-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -61,7 +92,46 @@ document.querySelectorAll('.id2-btn').forEach(btn => {
 
 // Initialize logic for current page
 window.addEventListener('DOMContentLoaded', () => {
-    if (window.location.pathname.includes('live.html')) {
+    const path = window.location.pathname;
+    
+    if (path.includes('identity2.html') && myId === 'blind') {
+        // Blind user Voice Assistant for selecting the second person
+        if ('speechSynthesis' in window) {
+            setTimeout(() => {
+                const utterance = new SpeechSynthesisUtterance("Who are you talking to? Please say Hearing, Deaf, Mute, or Blind.");
+                utterance.onend = () => {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    if (SpeechRecognition) {
+                        const rec = new SpeechRecognition();
+                        // Play a tiny beep to indicate listening
+                        if (navigator.vibrate) navigator.vibrate(100);
+                        
+                        rec.onresult = (e) => {
+                            const spoken = e.results[0][0].transcript.toLowerCase();
+                            let detectedId = null;
+                            if (spoken.includes('hearing') || spoken.includes('speak')) detectedId = 'hearing';
+                            else if (spoken.includes('deaf') || spoken.includes('sign')) detectedId = 'deaf';
+                            else if (spoken.includes('mute') || spoken.includes('type')) detectedId = 'mute';
+                            else if (spoken.includes('blind')) detectedId = 'blind';
+                            
+                            if (detectedId) {
+                                window.speechSynthesis.speak(new SpeechSynthesisUtterance(`Selected ${detectedId}. Starting bridge.`));
+                                localStorage.setItem('theirId', detectedId);
+                                setTimeout(() => window.location.href = 'live.html', 2000);
+                            } else {
+                                window.speechSynthesis.speak(new SpeechSynthesisUtterance("I didn't catch that. Please reload the page to try again."));
+                            }
+                        };
+                        rec.onerror = () => {
+                            window.speechSynthesis.speak(new SpeechSynthesisUtterance("Could not hear you."));
+                        };
+                        rec.start();
+                    }
+                };
+                window.speechSynthesis.speak(utterance);
+            }, 500);
+        }
+    } else if (path.includes('live.html')) {
         setupUniversalMode();
         if (needsCamera()) {
             startCamera();
@@ -69,7 +139,7 @@ window.addEventListener('DOMContentLoaded', () => {
             const feed = document.getElementById('camera-feed');
             if (feed) feed.srcObject = null;
         }
-    } else if (window.location.pathname.includes('learn.html')) {
+    } else if (path.includes('learn.html')) {
         startLearnMode();
     }
 });
@@ -193,14 +263,13 @@ let demoIdx = 0;
 const demoSpeechToText = ["Hello, how can I help you?", "The weather is nice today.", "Let's go get some coffee."];
 
 let GROQ_API_KEY = "YOUR_GROQ_API_KEY";
+let configLoaded = true; // No longer async, loaded via script tag
 
-// Fetch the API key from config.json
-fetch('config.json')
-    .then(response => response.json())
-    .then(data => {
-        if (data.GROQ_API_KEY) GROQ_API_KEY = data.GROQ_API_KEY;
-    })
-    .catch(err => console.warn("config.json not found. API key won't be loaded."));
+if (typeof CONFIG !== 'undefined' && CONFIG.GROQ_API_KEY) {
+    GROQ_API_KEY = CONFIG.GROQ_API_KEY;
+}
+
+const loadConfig = Promise.resolve(); // Keep promise for compatibility with startLearnMode
 
 async function addPunctuationViaGroq(rawText) {
     if (!GROQ_API_KEY || GROQ_API_KEY === "YOUR_GROQ_API_KEY") return rawText;
@@ -212,7 +281,7 @@ async function addPunctuationViaGroq(rawText) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                model: "llama3-8b-8192",
+                model: "llama-3.1-8b-instant",
                 messages: [{
                     role: "system",
                     content: "You are an assistant that adds correct punctuation and capitalization to raw transcribed speech or sign language outputs. ONLY output the corrected text. Do not add any conversational filler like 'Here is the text'."
@@ -280,7 +349,7 @@ function predictWebcam() {
     }
 }
 
-document.getElementById('action-btn').addEventListener('click', () => {
+document.getElementById('action-btn')?.addEventListener('click', () => {
     const btn = document.getElementById('action-btn');
     const narrationText = document.getElementById('narration-text');
     const textDisplayBlock = document.getElementById('text-display');
@@ -415,6 +484,7 @@ const friendlyNames = {
 };
 
 async function startLearnMode() {
+    await loadConfig;
     pickNewLearnSign();
     try {
         learnStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
@@ -435,14 +505,64 @@ function stopLearnMode() {
     }
 }
 
-function pickNewLearnSign() {
-    const oldTarget = learnTarget;
-    while (learnTarget === oldTarget || !learnTarget) {
-        learnTarget = learnGestures[Math.floor(Math.random() * learnGestures.length)];
+async function getGroqLesson(signName) {
+    if (!GROQ_API_KEY || GROQ_API_KEY === "YOUR_GROQ_API_KEY") return "Show the hand sign for: " + signName;
+    try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${GROQ_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "llama-3.1-8b-instant",
+                messages: [{
+                    role: "system",
+                    content: "You are an ASL tutor. Given a basic hand sign name, generate a 1-sentence creative challenge. ONLY output the scenario."
+                }, {
+                    role: "user",
+                    content: "Sign: " + signName
+                }],
+                temperature: 0.7,
+                max_tokens: 100
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Groq API Error Details:", errorData);
+            return "Show the hand sign for: " + signName;
+        }
+
+        const data = await response.json();
+        return data.choices[0].message.content.trim();
+    } catch (e) {
+        console.error("Network or parsing error:", e);
+        return "Show the hand sign for: " + signName;
     }
-    document.getElementById('target-sign').textContent = friendlyNames[learnTarget];
-    document.getElementById('learn-status').textContent = "Show your hand to the camera...";
+}
+
+async function pickNewLearnSign() {
+    const oldTarget = learnTarget;
+    learnTarget = null; // Clear target so we don't detect anything while "Thinking"
+    
+    let nextTarget = oldTarget;
+    while (nextTarget === oldTarget || !nextTarget) {
+        nextTarget = learnGestures[Math.floor(Math.random() * learnGestures.length)];
+    }
+    
+    const signLabel = friendlyNames[nextTarget];
+    document.getElementById('target-sign').textContent = signLabel;
     document.getElementById('target-sign').style.color = "var(--gold)";
+    document.getElementById('learn-status').textContent = "Thinking of a challenge...";
+    
+    const scenario = await getGroqLesson(signLabel);
+    const scenarioEl = document.getElementById('tutor-scenario');
+    if (scenarioEl) scenarioEl.textContent = scenario;
+    
+    // ONLY set the target once the lesson is ready
+    learnTarget = nextTarget;
+    document.getElementById('learn-status').textContent = "Show your hand to the camera...";
 }
 
 let learnVideoTime = -1;
@@ -455,11 +575,15 @@ function learnLoop() {
             if (results.gestures.length > 0) {
                 const detected = results.gestures[0][0].categoryName;
                 if (detected === learnTarget) {
+                    const targetEl = document.getElementById('target-sign');
                     document.getElementById('learn-status').textContent = "✅ Correct! Great job!";
-                    document.getElementById('target-sign').style.color = "var(--green)";
+                    targetEl.style.color = "var(--green)";
+                    targetEl.classList.add('success-pulse');
+                    
                     // Pause, then next sign
                     cancelAnimationFrame(learnTimer);
                     setTimeout(() => {
+                        targetEl.classList.remove('success-pulse');
                         pickNewLearnSign();
                         learnTimer = requestAnimationFrame(learnLoop);
                     }, 2000);

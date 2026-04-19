@@ -35,7 +35,8 @@
 
         <main class="live-main">
             <div style="text-align:center; padding: 20px 0;">
-                <h2 style="font-family: var(--font-head); font-size: 28px; margin-bottom: 10px;">Show me: <span id="target-sign" style="color: var(--gold);">Thumb Up</span></h2>
+                <h2 style="font-family: var(--font-head); font-size: 28px; margin-bottom: 5px;">Show me: <span id="target-sign" style="color: var(--gold);">Thumb Up</span></h2>
+                <p id="tutor-scenario" style="color: #ccc; font-style: italic; font-size: 16px; max-width: 80%; margin: 0 auto 10px auto; min-height: 1.2em;">Loading dynamic lesson...</p>
                 <p id="learn-status" style="color: #888; font-size: 14px;">Waiting for camera...</p>
             </div>
             
@@ -54,7 +55,8 @@
             </div>
         </main>
     </section>
-<script src="asl.js"></script>
+<script src="config.js"></script>
+    <script src="asl.js"></script>
     <script type="module">
         import { GestureRecognizer, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3";
         window.GestureRecognizer = GestureRecognizer;
