@@ -3,7 +3,11 @@ let prevScreen = localStorage.getItem('prevScreen') || 'index';
 
 function goTo(name) {
     if (name === 'setup') name = 'index';
-    window.location.href = name + '.html';
+    const isLocal = window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.protocol === 'file:';
+
+    window.location.href = name + (isLocal ? '.html' : '');
 }
 
 document.getElementById('use-phone-btn')?.addEventListener('click', () => goTo('identity1'));
@@ -20,10 +24,10 @@ document.getElementById('learn-back-btn')?.addEventListener('click', () => {
     stopLearnMode();
     goTo('setup');
 });
-document.getElementById('settings-btn')?.addEventListener('click', () => { 
+document.getElementById('settings-btn')?.addEventListener('click', () => {
     let current = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
     localStorage.setItem('prevScreen', current);
-    goTo('settings'); 
+    goTo('settings');
 });
 document.getElementById('settings-back-btn')?.addEventListener('click', () => goTo(prevScreen));
 
@@ -47,18 +51,18 @@ let blindModeTimer;
 function startBlindModeTimer() {
     // Only apply on the setup or identity screens
     if (window.location.pathname.includes('live') || window.location.pathname.includes('learn')) return;
-    
+
     blindModeTimer = setTimeout(() => {
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-        
+
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance("Blind mode activated. Proceeding to next screen.");
             window.speechSynthesis.speak(utterance);
         }
-        
+
         localStorage.setItem('myId', 'blind');
-        window.location.href = 'identity2.html';
+        goTo('identity2');
     }, 2000);
 }
 
@@ -68,7 +72,7 @@ function cancelBlindModeTimer() {
 
 document.addEventListener('mousedown', startBlindModeTimer);
 document.addEventListener('mouseup', cancelBlindModeTimer);
-document.addEventListener('touchstart', startBlindModeTimer, {passive: true});
+document.addEventListener('touchstart', startBlindModeTimer, { passive: true });
 document.addEventListener('touchend', cancelBlindModeTimer);
 document.addEventListener('touchcancel', cancelBlindModeTimer);
 
@@ -93,8 +97,8 @@ document.querySelectorAll('.id2-btn').forEach(btn => {
 // Initialize logic for current page
 window.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname;
-    
-    if (path.includes('identity2.html') && myId === 'blind') {
+
+    if (path.includes('identity2') && myId === 'blind') {
         // Blind user Voice Assistant for selecting the second person
         if ('speechSynthesis' in window) {
             setTimeout(() => {
@@ -117,7 +121,7 @@ window.addEventListener('DOMContentLoaded', () => {
                             if (detectedId) {
                                 window.speechSynthesis.speak(new SpeechSynthesisUtterance(`Selected ${detectedId}. Starting bridge.`));
                                 localStorage.setItem('theirId', detectedId);
-                                setTimeout(() => window.location.href = 'live.html', 2000);
+                                setTimeout(() => goTo('live'), 2000);
                             } else {
                                 window.speechSynthesis.speak(new SpeechSynthesisUtterance("I didn't catch that. Please reload the page to try again."));
                             }
@@ -131,7 +135,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 window.speechSynthesis.speak(utterance);
             }, 500);
         }
-    } else if (path.includes('live.html')) {
+    } else if (path.includes('live')) {
         setupUniversalMode();
         if (needsCamera()) {
             startCamera();
@@ -139,7 +143,7 @@ window.addEventListener('DOMContentLoaded', () => {
             const feed = document.getElementById('camera-feed');
             if (feed) feed.srcObject = null;
         }
-    } else if (path.includes('learn.html')) {
+    } else if (path.includes('learn')) {
         startLearnMode();
     }
 });
@@ -545,21 +549,21 @@ async function getGroqLesson(signName) {
 async function pickNewLearnSign() {
     const oldTarget = learnTarget;
     learnTarget = null; // Clear target so we don't detect anything while "Thinking"
-    
+
     let nextTarget = oldTarget;
     while (nextTarget === oldTarget || !nextTarget) {
         nextTarget = learnGestures[Math.floor(Math.random() * learnGestures.length)];
     }
-    
+
     const signLabel = friendlyNames[nextTarget];
     document.getElementById('target-sign').textContent = signLabel;
     document.getElementById('target-sign').style.color = "var(--gold)";
     document.getElementById('learn-status').textContent = "Thinking of a challenge...";
-    
+
     const scenario = await getGroqLesson(signLabel);
     const scenarioEl = document.getElementById('tutor-scenario');
     if (scenarioEl) scenarioEl.textContent = scenario;
-    
+
     // ONLY set the target once the lesson is ready
     learnTarget = nextTarget;
     document.getElementById('learn-status').textContent = "Show your hand to the camera...";
@@ -579,7 +583,7 @@ function learnLoop() {
                     document.getElementById('learn-status').textContent = "✅ Correct! Great job!";
                     targetEl.style.color = "var(--green)";
                     targetEl.classList.add('success-pulse');
-                    
+
                     // Pause, then next sign
                     cancelAnimationFrame(learnTimer);
                     setTimeout(() => {
