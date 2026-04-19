@@ -657,6 +657,24 @@ body {
     text-align: center;
 }
 
+.asl-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 140px;
+    margin-bottom: 20px;
+}
+
+.asl-display svg {
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));
+    animation: sign-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes sign-pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
 /* ── Type input (mute mode) ─────────────────────── */
 .type-input-area {
     position: absolute;

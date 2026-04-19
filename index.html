@@ -90,12 +90,11 @@
         </main>
     </section>
 
-    <!-- SCREEN 2: MODE SELECT -->
-    <section id="screen-mode" class="screen">
+    <!-- SCREEN 2: MY IDENTITY -->
+    <section id="screen-identity1" class="screen">
         <div class="grain"></div>
-
         <header class="sl-header">
-            <button class="back-btn" id="mode-back-btn">
+            <button class="back-btn" id="id1-back-btn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                     <path d="M19 12H5M12 19l-7-7 7-7" />
                 </svg>
@@ -103,8 +102,7 @@
             </button>
             <div class="sl-logo">
                 <svg class="sl-logo-eye" width="22" height="14" viewBox="0 0 28 18" fill="none">
-                    <path d="M1 9C5 2 10 0 14 0C18 0 23 2 27 9C23 16 18 18 14 18C10 18 5 16 1 9Z" stroke="currentColor"
-                        stroke-width="1.2" fill="none" />
+                    <path d="M1 9C5 2 10 0 14 0C18 0 23 2 27 9C23 16 18 18 14 18C10 18 5 16 1 9Z" stroke="currentColor" stroke-width="1.2" fill="none" />
                     <circle cx="14" cy="9" r="3.5" stroke="currentColor" stroke-width="1.2" fill="none" />
                     <circle cx="14" cy="9" r="1.2" fill="currentColor" />
                 </svg>
@@ -115,53 +113,152 @@
         <main class="mode-main">
             <div class="mode-heading">
                 <span class="mode-step">01 / Setup</span>
-                <h2 class="mode-title">Who are you<br />talking to?</h2>
+                <h2 class="mode-title">Who are<br />you?</h2>
             </div>
 
             <div class="mode-list">
-                <button class="mode-item" data-mode="deaf" id="mode-deaf">
+                <button class="mode-item id1-btn" data-id="hearing" id="id1-hearing">
                     <div class="mode-num">01</div>
                     <div class="mode-glyph">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0"/>
-                            <path d="M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4"/>
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="22"/>
+                        </svg>
+                    </div>
+                    <div class="mode-info">
+                        <h3 class="mode-name">Hearing / Speaking</h3>
+                        <p class="mode-desc">I have no disabilities.</p>
+                    </div>
+                </button>
+
+                <button class="mode-item id1-btn" data-id="deaf" id="id1-deaf">
+                    <div class="mode-num">02</div>
+                    <div class="mode-glyph">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0" />
+                            <path d="M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4" />
                         </svg>
                     </div>
                     <div class="mode-info">
                         <h3 class="mode-name">Deaf Person</h3>
-                        <p class="mode-desc">Sign language → speech. Your voice → on-screen text.</p>
+                        <p class="mode-desc">I use Sign Language.</p>
                     </div>
-                    <div class="mode-tag">ASL</div>
                 </button>
 
-                <button class="mode-item" data-mode="mute" id="mode-mute">
-                    <div class="mode-num">02</div>
+                <button class="mode-item id1-btn" data-id="mute" id="id1-mute">
+                    <div class="mode-num">03</div>
                     <div class="mode-glyph">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="4" width="20" height="16" rx="2" ry="2"/>
-                            <path d="M6 8h.01"/><path d="M10 8h.01"/><path d="M14 8h.01"/><path d="M18 8h.01"/><path d="M8 12h.01"/><path d="M12 12h.01"/><path d="M16 12h.01"/><path d="M7 16h10"/>
+                            <rect x="2" y="4" width="20" height="16" rx="2" ry="2" />
+                            <path d="M6 8h.01" /><path d="M10 8h.01" /><path d="M14 8h.01" /><path d="M18 8h.01" /><path d="M8 12h.01" /><path d="M12 12h.01" /><path d="M16 12h.01" /><path d="M7 16h10" />
                         </svg>
                     </div>
                     <div class="mode-info">
                         <h3 class="mode-name">Mute Person</h3>
-                        <p class="mode-desc">They type, you hear. You speak, they read.</p>
+                        <p class="mode-desc">I type to communicate.</p>
                     </div>
-                    <div class="mode-tag">Text</div>
                 </button>
 
-                <button class="mode-item" data-mode="blind" id="mode-blind">
-                    <div class="mode-num">03</div>
+                <button class="mode-item id1-btn" data-id="blind" id="id1-blind">
+                    <div class="mode-num">04</div>
                     <div class="mode-glyph">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                            <circle cx="12" cy="12" r="3" />
                         </svg>
                     </div>
                     <div class="mode-info">
                         <h3 class="mode-name">Blind Person</h3>
-                        <p class="mode-desc">Camera describes surroundings and reads text aloud.</p>
+                        <p class="mode-desc">I rely on audio feedback.</p>
                     </div>
-                    <div class="mode-tag">Scene</div>
+                </button>
+            </div>
+        </main>
+    </section>
+
+    <!-- SCREEN 3: THEIR IDENTITY -->
+    <section id="screen-identity2" class="screen">
+        <div class="grain"></div>
+        <header class="sl-header">
+            <button class="back-btn" id="id2-back-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                Back
+            </button>
+            <div class="sl-logo">
+                <svg class="sl-logo-eye" width="22" height="14" viewBox="0 0 28 18" fill="none">
+                    <path d="M1 9C5 2 10 0 14 0C18 0 23 2 27 9C23 16 18 18 14 18C10 18 5 16 1 9Z" stroke="currentColor" stroke-width="1.2" fill="none" />
+                    <circle cx="14" cy="9" r="3.5" stroke="currentColor" stroke-width="1.2" fill="none" />
+                    <circle cx="14" cy="9" r="1.2" fill="currentColor" />
+                </svg>
+                <span class="sl-logo-text">SightLine</span>
+            </div>
+        </header>
+
+        <main class="mode-main">
+            <div class="mode-heading">
+                <span class="mode-step">02 / Setup</span>
+                <h2 class="mode-title">Who are you<br />talking to?</h2>
+            </div>
+
+            <div class="mode-list">
+                <button class="mode-item id2-btn" data-id="hearing" id="id2-hearing">
+                    <div class="mode-num">01</div>
+                    <div class="mode-glyph">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="22"/>
+                        </svg>
+                    </div>
+                    <div class="mode-info">
+                        <h3 class="mode-name">Hearing / Speaking</h3>
+                        <p class="mode-desc">They have no disabilities.</p>
+                    </div>
+                </button>
+
+                <button class="mode-item id2-btn" data-id="deaf" id="id2-deaf">
+                    <div class="mode-num">02</div>
+                    <div class="mode-glyph">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0" />
+                            <path d="M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4" />
+                        </svg>
+                    </div>
+                    <div class="mode-info">
+                        <h3 class="mode-name">Deaf Person</h3>
+                        <p class="mode-desc">They use Sign Language.</p>
+                    </div>
+                </button>
+
+                <button class="mode-item id2-btn" data-id="mute" id="id2-mute">
+                    <div class="mode-num">03</div>
+                    <div class="mode-glyph">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="4" width="20" height="16" rx="2" ry="2" />
+                            <path d="M6 8h.01" /><path d="M10 8h.01" /><path d="M14 8h.01" /><path d="M18 8h.01" /><path d="M8 12h.01" /><path d="M12 12h.01" /><path d="M16 12h.01" /><path d="M7 16h10" />
+                        </svg>
+                    </div>
+                    <div class="mode-info">
+                        <h3 class="mode-name">Mute Person</h3>
+                        <p class="mode-desc">They type to communicate.</p>
+                    </div>
+                </button>
+
+                <button class="mode-item id2-btn" data-id="blind" id="id2-blind">
+                    <div class="mode-num">04</div>
+                    <div class="mode-glyph">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
+                    </div>
+                    <div class="mode-info">
+                        <h3 class="mode-name">Blind Person</h3>
+                        <p class="mode-desc">They rely on audio feedback.</p>
+                    </div>
                 </button>
             </div>
         </main>
@@ -213,6 +310,7 @@
 
         <!-- Large display for deaf/mute to read -->
         <div id="text-display" class="text-display hidden" aria-live="polite">
+            <div id="asl-display" class="asl-display"></div>
             <p id="display-text" class="display-text"></p>
         </div>
 
@@ -314,70 +412,242 @@
         </main>
     </section>
 
+    <script src="asl.js"></script>
     <script>
-        // ─── Navigation ───────────────────────────────────────────────
+        // Navigation
         const screens = {
             setup: document.getElementById('screen-setup'),
-            mode: document.getElementById('screen-mode'),
+            identity1: document.getElementById('screen-identity1'),
+            identity2: document.getElementById('screen-identity2'),
             live: document.getElementById('screen-live'),
             settings: document.getElementById('screen-settings'),
         };
-        let prevScreen = 'mode';
+        let prevScreen = 'identity1';
 
         function goTo(name) {
             Object.values(screens).forEach(s => s.classList.remove('active'));
             screens[name].classList.add('active');
         }
 
-        document.getElementById('use-phone-btn').addEventListener('click', () => goTo('mode'));
-        document.getElementById('use-pi-btn').addEventListener('click', () => goTo('mode'));
-        document.getElementById('mode-back-btn').addEventListener('click', () => goTo('setup'));
-        document.getElementById('live-back-btn').addEventListener('click', () => goTo('mode'));
+        document.getElementById('use-phone-btn').addEventListener('click', () => goTo('identity1'));
+        document.getElementById('use-pi-btn').addEventListener('click', () => goTo('identity1'));
+        
+        document.getElementById('id1-back-btn').addEventListener('click', () => goTo('setup'));
+        document.getElementById('id2-back-btn').addEventListener('click', () => goTo('identity1'));
+        document.getElementById('live-back-btn').addEventListener('click', () => goTo('identity2'));
         document.getElementById('settings-btn').addEventListener('click', () => { prevScreen = 'live'; goTo('settings'); });
         document.getElementById('settings-back-btn').addEventListener('click', () => goTo(prevScreen));
 
-        // Mode cards
-        let currentMode = 'deaf';
-        document.querySelectorAll('.mode-item').forEach(btn => {
+        // State
+        let myId = 'hearing';
+        let theirId = 'hearing';
+        
+        // Identity 1 selection
+        document.querySelectorAll('.id1-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                currentMode = btn.dataset.mode;
-                document.getElementById('mode-label').textContent = currentMode.toUpperCase() + ' MODE';
-                setupMode(currentMode);
-                goTo('live');
-                startCamera();
+                myId = btn.dataset.id;
+                goTo('identity2');
             });
         });
 
-        // ─── Mode UI ─────────────────────────────────────────────────
-        function setupMode(mode) {
-            document.getElementById('type-input-area').classList.add('hidden');
-            document.getElementById('text-display').classList.add('hidden');
-            if (mode === 'mute') document.getElementById('type-input-area').classList.remove('hidden');
-        }
-
-        // ─── Camera ───────────────────────────────────────────────────
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-                document.getElementById('camera-feed').srcObject = stream;
-            } catch (e) { console.warn('Camera unavailable', e); }
-        }
-
-        // ─── Action button (demo) ─────────────────────────────────────
-        const msgs = {
-            deaf: ["Signing: 'Hello, how are you?'", "Signing: 'My name is Alex'", "Signing: 'Thank you very much'"],
-            mute: ["Ready for typed input.", "Message sent.", "Listening…"],
-            blind: ["Clear sidewalk ahead, street sign reads 'Main St'.", "Text detected: 'Push to open'", "Three steps leading down on your right."],
-        };
-        let msgIdx = 0;
-
-        document.getElementById('action-btn').addEventListener('click', () => {
-            const list = msgs[currentMode] || msgs.deaf;
-            document.getElementById('narration-text').textContent = list[msgIdx % list.length];
-            msgIdx++;
+        // Identity 2 selection
+        document.querySelectorAll('.id2-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                theirId = btn.dataset.id;
+                setupUniversalMode();
+                goTo('live');
+                if (needsCamera()) {
+                    startCamera();
+                } else {
+                    document.getElementById('camera-feed').srcObject = null;
+                }
+            });
         });
 
-        // ─── Speak typed ─────────────────────────────────────────────
+        function needsCamera() {
+            // Only need camera if someone is deaf (for ASL recognition) or blind (for scene description)
+            return myId === 'deaf' || theirId === 'deaf' || myId === 'blind' || theirId === 'blind';
+        }
+
+        // Mode UI Setup
+        function setupUniversalMode() {
+            document.getElementById('type-input-area').classList.add('hidden');
+            document.getElementById('text-display').classList.add('hidden');
+            
+            // If I am mute, I need the keyboard
+            if (myId === 'mute') {
+                document.getElementById('type-input-area').classList.remove('hidden');
+            }
+            
+            // Adjust action button label
+            const actionLabel = document.querySelector('.action-label');
+            if (myId === 'blind' || myId === 'hearing') {
+                actionLabel.textContent = "Hold to Speak";
+            } else if (myId === 'deaf') {
+                actionLabel.textContent = "Record ASL";
+            } else {
+                actionLabel.textContent = "Capture";
+            }
+        }
+
+        async function startCamera() {
+            try {
+                let stream;
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+                } catch (err) {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                }
+                document.getElementById('camera-feed').srcObject = stream;
+            } catch (e) {
+                console.warn('Camera unavailable', e);
+            }
+        }
+
+        // ASL Animation logic
+        let aslTimer = null;
+        function playASLAnimation(text) {
+            const display = document.getElementById('asl-display');
+            const textDisplay = document.getElementById('display-text');
+            document.getElementById('text-display').classList.remove('hidden');
+
+            const letters = text.toUpperCase().split('').filter(ch => ASL_SIGNS[ch] || ch === ' ');
+            display.innerHTML = '';
+            textDisplay.textContent = '';
+
+            if (aslTimer) clearInterval(aslTimer);
+            let i = 0;
+
+            aslTimer = setInterval(() => {
+                if (i >= letters.length) {
+                    clearInterval(aslTimer);
+                    setTimeout(() => {
+                        document.getElementById('text-display').classList.add('hidden');
+                    }, 4000);
+                    return;
+                }
+                const ch = letters[i];
+                if (ASL_SIGNS[ch]) {
+                    display.innerHTML = ASL_SIGNS[ch](120);
+                } else {
+                    display.innerHTML = '';
+                }
+                textDisplay.textContent = text.substring(0, i + 1);
+                i++;
+            }, 600);
+        }
+
+        let isRecording = false;
+        let demoIdx = 0;
+        
+        // Demo phrases
+        const demoSpeechToText = ["Hello, how can I help you?", "The weather is nice today.", "Let's go get some coffee."];
+        const demoASLToText = ["I NEED WATER", "WHERE IS THE RESTROOM", "THANK YOU VERY MUCH"];
+        const demoSceneToText = ["A clear sidewalk is ahead.", "Street sign reads 'Main St'.", "A person is waving at you."];
+
+        document.getElementById('action-btn').addEventListener('click', () => {
+            const btn = document.getElementById('action-btn');
+            const narrationText = document.getElementById('narration-text');
+            const textDisplayBlock = document.getElementById('text-display');
+            const display = document.getElementById('display-text');
+            const actionLabel = document.querySelector('.action-label');
+
+            if (!isRecording) {
+                isRecording = true;
+                btn.style.borderColor = 'var(--red)';
+                document.querySelector('.action-ring').style.borderColor = 'var(--red)';
+                document.querySelector('.action-ring-2').style.borderColor = 'rgba(232, 112, 96, 0.5)';
+                
+                if (myId === 'deaf') {
+                    narrationText.textContent = "Recording ASL... (Sign now)";
+                    actionLabel.textContent = "Stop Recording";
+                } else if (myId === 'blind' || myId === 'hearing') {
+                    narrationText.textContent = "Listening to speech...";
+                    actionLabel.textContent = "Stop Listening";
+                }
+            } else {
+                isRecording = false;
+                btn.style.borderColor = '';
+                document.querySelector('.action-ring').style.borderColor = '';
+                document.querySelector('.action-ring-2').style.borderColor = '';
+                setupUniversalMode(); // reset label
+                
+                narrationText.textContent = "Translating...";
+                
+                setTimeout(() => {
+                    let textResult = "";
+                    
+                    if (myId === 'deaf') {
+                        // Camera analyzed ASL -> Text
+                        textResult = demoASLToText[demoIdx % demoASLToText.length];
+                        demoIdx++;
+                        narrationText.textContent = "Translated ASL: " + textResult;
+                        
+                        if (theirId === 'blind' || theirId === 'hearing') {
+                            // Translate to Audio
+                            speakText(textResult);
+                        } else if (theirId === 'mute' || theirId === 'deaf') {
+                            // They read it on screen
+                            showTextOnScreen(textResult);
+                        }
+                    } 
+                    else if (myId === 'blind' || myId === 'hearing') {
+                        // Mic analyzed Speech -> Text
+                        textResult = demoSpeechToText[demoIdx % demoSpeechToText.length];
+                        demoIdx++;
+                        narrationText.textContent = "Recognized Speech: " + textResult;
+                        
+                        if (theirId === 'deaf') {
+                            // Text -> ASL Animation
+                            playASLAnimation(textResult);
+                        } else if (theirId === 'mute' || theirId === 'hearing') {
+                            // Text -> Screen reading
+                            showTextOnScreen(textResult);
+                        }
+                    }
+                }, 1000);
+            }
+        });
+
+        function showTextOnScreen(text) {
+            const textDisplayBlock = document.getElementById('text-display');
+            const display = document.getElementById('display-text');
+            const aslDisplay = document.getElementById('asl-display');
+            
+            aslDisplay.innerHTML = '';
+            textDisplayBlock.classList.remove('hidden');
+            display.textContent = text;
+            setTimeout(() => textDisplayBlock.classList.add('hidden'), 5000);
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const u = new SpeechSynthesisUtterance(text);
+                window.speechSynthesis.speak(u);
+            }
+        }
+
+        // Mute Person Typing
+        document.getElementById('speak-typed-btn')?.addEventListener('click', () => {
+            const txt = document.getElementById('type-input').value.trim();
+            if (!txt) return;
+            
+            document.getElementById('narration-text').textContent = "Typed: " + txt;
+            
+            if (theirId === 'blind' || theirId === 'hearing') {
+                speakText(txt);
+            } 
+            if (theirId === 'deaf') {
+                playASLAnimation(txt);
+            }
+            if (theirId === 'mute') {
+                showTextOnScreen(txt);
+            }
+            
+            document.getElementById('type-input').value = '';
+        });
+
+        // Speak typed
         document.getElementById('speak-typed-btn')?.addEventListener('click', () => {
             const txt = document.getElementById('type-input').value.trim();
             if (!txt) return;
@@ -387,7 +657,7 @@
             }
         });
 
-        // ─── Settings sliders ─────────────────────────────────────────
+        // Settings sliders
         document.getElementById('analysis-interval').addEventListener('input', function () {
             document.getElementById('interval-value').textContent = this.value + 's';
         });
