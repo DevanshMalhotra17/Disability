@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SightLine — Communication Bridge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+<section id="screen-settings" class="screen active">
+        <div class="grain"></div>
+
+        <header class="sl-header">
+            <button class="back-btn" id="settings-back-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                Back
+            </button>
+            <span class="sl-header-title">Settings</span>
+        </header>
+
+        <main class="settings-main">
+            <div class="settings-section">
+                <span class="settings-section-label">Translation</span>
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <span class="settings-row-name">Auto-capture interval</span>
+                        <span id="interval-value" class="settings-row-val">3s</span>
+                    </div>
+                    <input type="range" id="analysis-interval" class="sl-range" min="1" max="10" value="3" step="1" />
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <span class="settings-section-label">Voice Output</span>
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <span class="settings-row-name">Speech rate</span>
+                        <span id="rate-value" class="settings-row-val">1.0×</span>
+                    </div>
+                    <input type="range" id="speech-rate" class="sl-range" min="0.5" max="2.5" value="1.0" step="0.1" />
+                </div>
+                <div class="settings-row">
+                    <span class="settings-row-name">Voice</span>
+                    <select id="voice-select" class="sl-select">
+                        <option value="">System default</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <span class="settings-section-label">Hardware</span>
+                <div class="settings-row">
+                    <span class="settings-row-name">Raspberry Pi</span>
+                    <button class="sl-btn-outline" id="pi-connect-btn">Connect via Bluetooth</button>
+                </div>
+            </div>
+
+            <div class="settings-about">
+                <div class="about-logo">
+                    <svg class="sl-logo-eye" width="32" height="20" viewBox="0 0 28 18" fill="none">
+                        <path d="M1 9C5 2 10 0 14 0C18 0 23 2 27 9C23 16 18 18 14 18C10 18 5 16 1 9Z"
+                            stroke="currentColor" stroke-width="1.2" fill="none" />
+                        <circle cx="14" cy="9" r="3.5" stroke="currentColor" stroke-width="1.2" fill="none" />
+                        <circle cx="14" cy="9" r="1.2" fill="currentColor" />
+                    </svg>
+                    SightLine
+                </div>
+                <p class="about-text">Version 2.1.0 · Communication Bridge</p>
+            </div>
+        </main>
+    </section>
+<script src="asl.js"></script>
+    <script type="module">
+        import { GestureRecognizer, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3";
+        window.GestureRecognizer = GestureRecognizer;
+        window.FilesetResolver = FilesetResolver;
+    </script>
+    <script src="main.js"></script>
+</body>
+
+</html>

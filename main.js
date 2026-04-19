@@ -1,35 +1,51 @@
 // Navigation
-const screens = {
-    setup: document.getElementById('screen-setup'),
-    identity1: document.getElementById('screen-identity1'),
-    identity2: document.getElementById('screen-identity2'),
-    live: document.getElementById('screen-live'),
-    settings: document.getElementById('screen-settings'),
-};
-let prevScreen = 'identity1';
+let prevScreen = localStorage.getItem('prevScreen') || 'index';
 
 function goTo(name) {
-    Object.values(screens).forEach(s => s.classList.remove('active'));
-    screens[name].classList.add('active');
+    if (name === 'setup') name = 'index';
+    window.location.href = name + '.html';
 }
 
-document.getElementById('use-phone-btn').addEventListener('click', () => goTo('identity1'));
-document.getElementById('use-pi-btn').addEventListener('click', () => goTo('identity1'));
+document.getElementById('use-phone-btn')?.addEventListener('click', () => goTo('identity1'));
+document.getElementById('use-pi-btn')?.addEventListener('click', () => goTo('identity1'));
+document.getElementById('learn-asl-btn')?.addEventListener('click', () => goTo('learn'));
 
-document.getElementById('id1-back-btn').addEventListener('click', () => goTo('setup'));
-document.getElementById('id2-back-btn').addEventListener('click', () => goTo('identity1'));
-document.getElementById('live-back-btn').addEventListener('click', () => goTo('identity2'));
-document.getElementById('settings-btn').addEventListener('click', () => { prevScreen = 'live'; goTo('settings'); });
-document.getElementById('settings-back-btn').addEventListener('click', () => goTo(prevScreen));
+document.getElementById('id1-back-btn')?.addEventListener('click', () => goTo('setup'));
+document.getElementById('id2-back-btn')?.addEventListener('click', () => goTo('identity1'));
+document.getElementById('live-back-btn')?.addEventListener('click', () => {
+    stopLearnMode();
+    goTo('identity2');
+});
+document.getElementById('learn-back-btn')?.addEventListener('click', () => {
+    stopLearnMode();
+    goTo('setup');
+});
+document.getElementById('settings-btn')?.addEventListener('click', () => { 
+    let current = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
+    localStorage.setItem('prevScreen', current);
+    goTo('settings'); 
+});
+document.getElementById('settings-back-btn')?.addEventListener('click', () => goTo(prevScreen));
 
 // State
-let myId = 'hearing';
-let theirId = 'hearing';
+let myId = localStorage.getItem('myId') || 'hearing';
+let theirId = localStorage.getItem('theirId') || 'hearing';
+
+// Blind mode "Tap anywhere" to speak
+document.body.addEventListener('click', (e) => {
+    if (window.location.pathname.includes('live') && myId === 'blind') {
+        if (!e.target.closest('.sl-header') && !e.target.closest('.live-top') && !e.target.closest('.live-controls')) {
+            const btn = document.getElementById('action-btn');
+            if (btn) btn.click();
+        }
+    }
+});
 
 // Identity 1 selection
 document.querySelectorAll('.id1-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         myId = btn.dataset.id;
+        localStorage.setItem('myId', myId);
         goTo('identity2');
     });
 });
@@ -38,14 +54,24 @@ document.querySelectorAll('.id1-btn').forEach(btn => {
 document.querySelectorAll('.id2-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         theirId = btn.dataset.id;
-        setupUniversalMode();
+        localStorage.setItem('theirId', theirId);
         goTo('live');
+    });
+});
+
+// Initialize logic for current page
+window.addEventListener('DOMContentLoaded', () => {
+    if (window.location.pathname.includes('live.html')) {
+        setupUniversalMode();
         if (needsCamera()) {
             startCamera();
         } else {
-            document.getElementById('camera-feed').srcObject = null;
+            const feed = document.getElementById('camera-feed');
+            if (feed) feed.srcObject = null;
         }
-    });
+    } else if (window.location.pathname.includes('learn.html')) {
+        startLearnMode();
+    }
 });
 
 function needsCamera() {
@@ -62,13 +88,13 @@ function setupUniversalMode() {
 
     let source = "Text";
     let dest = "Text";
-    
+
     if (myId === 'hearing' || myId === 'blind') source = "Speech";
     else if (myId === 'deaf') source = "ASL";
-    
+
     if (theirId === 'hearing' || theirId === 'blind') dest = "Audio";
     else if (theirId === 'deaf') dest = "ASL";
-    
+
     document.getElementById('mode-label').textContent = `${source} → ${dest}`;
 
     const actionLabel = document.querySelector('.action-label');
@@ -166,15 +192,67 @@ let isRecording = false;
 let demoIdx = 0;
 const demoSpeechToText = ["Hello, how can I help you?", "The weather is nice today.", "Let's go get some coffee."];
 
-function processTranslationResult(textResult) {
+let GROQ_API_KEY = "YOUR_GROQ_API_KEY";
+
+// Fetch the API key from config.json
+fetch('config.json')
+    .then(response => response.json())
+    .then(data => {
+        if (data.GROQ_API_KEY) GROQ_API_KEY = data.GROQ_API_KEY;
+    })
+    .catch(err => console.warn("config.json not found. API key won't be loaded."));
+
+async function addPunctuationViaGroq(rawText) {
+    if (!GROQ_API_KEY || GROQ_API_KEY === "YOUR_GROQ_API_KEY") return rawText;
+    try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${GROQ_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "llama3-8b-8192",
+                messages: [{
+                    role: "system",
+                    content: "You are an assistant that adds correct punctuation and capitalization to raw transcribed speech or sign language outputs. ONLY output the corrected text. Do not add any conversational filler like 'Here is the text'."
+                }, {
+                    role: "user",
+                    content: rawText
+                }],
+                temperature: 0.1,
+                max_tokens: 150
+            })
+        });
+        const data = await response.json();
+        return data.choices[0].message.content.trim();
+    } catch (e) {
+        console.error("Groq API error", e);
+        return rawText;
+    }
+}
+
+async function processTranslationResult(textResult) {
     const narrationText = document.getElementById('narration-text');
 
+    // Check if we have a key before overriding the text
+    if (GROQ_API_KEY !== "YOUR_GROQ_API_KEY") {
+        narrationText.textContent = "Polishing grammar (Groq LLM)...";
+    }
+
+    const polishedText = await addPunctuationViaGroq(textResult);
+
+    // Update display with final text
+    if (GROQ_API_KEY !== "YOUR_GROQ_API_KEY") {
+        narrationText.textContent = "Final: " + polishedText;
+    }
+
     if (theirId === 'deaf') {
-        playASLAnimation(textResult);
+        playASLAnimation(polishedText);
     } else if (theirId === 'blind' || theirId === 'hearing') {
-        speakText(textResult);
+        speakText(polishedText);
     } else if (theirId === 'mute') {
-        showTextOnScreen(textResult);
+        showTextOnScreen(polishedText);
     }
 }
 
@@ -314,9 +392,89 @@ document.getElementById('speak-typed-btn')?.addEventListener('click', () => {
 });
 
 // Settings sliders
-document.getElementById('analysis-interval').addEventListener('input', function () {
+document.getElementById('analysis-interval')?.addEventListener('input', function () {
     document.getElementById('interval-value').textContent = this.value + 's';
 });
-document.getElementById('speech-rate').addEventListener('input', function () {
+document.getElementById('speech-rate')?.addEventListener('input', function () {
     document.getElementById('rate-value').textContent = parseFloat(this.value).toFixed(1) + '×';
+});
+
+// --- Education Hack: Interactive ASL Tutor ---
+let learnTimer = null;
+let learnTarget = "";
+let learnStream = null;
+
+const learnGestures = ["Thumb_Up", "Thumb_Down", "Open_Palm", "Closed_Fist", "Victory", "ILoveYou"];
+const friendlyNames = {
+    "Thumb_Up": "Thumbs Up 👍",
+    "Thumb_Down": "Thumbs Down 👎",
+    "Open_Palm": "Open Palm 🖐️",
+    "Closed_Fist": "Closed Fist ✊",
+    "Victory": "Peace Sign ✌️",
+    "ILoveYou": "I Love You 🤟"
+};
+
+async function startLearnMode() {
+    pickNewLearnSign();
+    try {
+        learnStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        const video = document.getElementById('learn-camera-feed');
+        video.srcObject = learnStream;
+
+        document.getElementById('learn-status').textContent = gestureRecognizer ? "Show your hand to the camera..." : "Loading ML Model...";
+        learnTimer = requestAnimationFrame(learnLoop);
+    } catch (e) {
+        document.getElementById('learn-status').textContent = "Camera access denied.";
+    }
+}
+
+function stopLearnMode() {
+    cancelAnimationFrame(learnTimer);
+    if (learnStream) {
+        learnStream.getTracks().forEach(t => t.stop());
+    }
+}
+
+function pickNewLearnSign() {
+    const oldTarget = learnTarget;
+    while (learnTarget === oldTarget || !learnTarget) {
+        learnTarget = learnGestures[Math.floor(Math.random() * learnGestures.length)];
+    }
+    document.getElementById('target-sign').textContent = friendlyNames[learnTarget];
+    document.getElementById('learn-status').textContent = "Show your hand to the camera...";
+    document.getElementById('target-sign').style.color = "var(--gold)";
+}
+
+let learnVideoTime = -1;
+function learnLoop() {
+    const video = document.getElementById('learn-camera-feed');
+    if (video && video.readyState >= 2 && gestureRecognizer) {
+        if (video.currentTime !== learnVideoTime) {
+            learnVideoTime = video.currentTime;
+            const results = gestureRecognizer.recognizeForVideo(video, Date.now());
+            if (results.gestures.length > 0) {
+                const detected = results.gestures[0][0].categoryName;
+                if (detected === learnTarget) {
+                    document.getElementById('learn-status').textContent = "✅ Correct! Great job!";
+                    document.getElementById('target-sign').style.color = "var(--green)";
+                    // Pause, then next sign
+                    cancelAnimationFrame(learnTimer);
+                    setTimeout(() => {
+                        pickNewLearnSign();
+                        learnTimer = requestAnimationFrame(learnLoop);
+                    }, 2000);
+                    return;
+                } else if (detected !== "None") {
+                    document.getElementById('learn-status').textContent = `I see ${friendlyNames[detected] || detected}. Try again!`;
+                }
+            } else {
+                document.getElementById('learn-status').textContent = "No hand detected...";
+            }
+        }
+    }
+    learnTimer = requestAnimationFrame(learnLoop);
+}
+
+document.getElementById('next-sign-btn')?.addEventListener('click', () => {
+    pickNewLearnSign();
 });
