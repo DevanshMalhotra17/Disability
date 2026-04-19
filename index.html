@@ -282,7 +282,7 @@
 
             <div class="live-mode-badge">
                 <span class="live-mode-dot"></span>
-                <span id="mode-label" class="live-mode-text">DEAF MODE</span>
+                <span id="mode-label" class="live-mode-text">UNIVERSAL BRIDGE</span>
             </div>
 
             <button class="live-settings-btn" id="settings-btn">
@@ -413,6 +413,11 @@
     </section>
 
     <script src="asl.js"></script>
+    <script type="module">
+        import { GestureRecognizer, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3";
+        window.GestureRecognizer = GestureRecognizer;
+        window.FilesetResolver = FilesetResolver;
+    </script>
     <script src="main.js"></script>
 </body>
 

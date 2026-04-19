@@ -49,17 +49,28 @@ document.querySelectorAll('.id2-btn').forEach(btn => {
 });
 
 function needsCamera() {
-    return myId === 'deaf' || theirId === 'deaf' || myId === 'blind' || theirId === 'blind';
+    return myId === 'deaf' || theirId === 'deaf' || myId === 'blind';
 }
 
 function setupUniversalMode() {
     document.getElementById('type-input-area').classList.add('hidden');
     document.getElementById('text-display').classList.add('hidden');
-    
+
     if (myId === 'mute') {
         document.getElementById('type-input-area').classList.remove('hidden');
     }
+
+    let source = "Text";
+    let dest = "Text";
     
+    if (myId === 'hearing' || myId === 'blind') source = "Speech";
+    else if (myId === 'deaf') source = "ASL";
+    
+    if (theirId === 'hearing' || theirId === 'blind') dest = "Audio";
+    else if (theirId === 'deaf') dest = "ASL";
+    
+    document.getElementById('mode-label').textContent = `${source} → ${dest}`;
+
     const actionLabel = document.querySelector('.action-label');
     if (myId === 'blind' || myId === 'hearing') {
         actionLabel.textContent = "Hold to Speak";
@@ -127,19 +138,67 @@ if (recognition) {
     recognition.lang = 'en-US';
 }
 
+// Real ASL Camera Recognition (MediaPipe ML)
+let gestureRecognizer = null;
+
+async function initGestureRecognizer() {
+    if (!window.FilesetResolver || !window.GestureRecognizer) {
+        setTimeout(initGestureRecognizer, 500);
+        return;
+    }
+    try {
+        const vision = await window.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
+        gestureRecognizer = await window.GestureRecognizer.createFromOptions(vision, {
+            baseOptions: {
+                modelAssetPath: "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
+                delegate: "GPU"
+            },
+            runningMode: "VIDEO"
+        });
+        console.log("Real ASL ML Model Loaded!");
+    } catch (e) {
+        console.error("Failed to load ML Model", e);
+    }
+}
+initGestureRecognizer();
+
 let isRecording = false;
 let demoIdx = 0;
-const demoASLToText = ["I NEED WATER", "WHERE IS THE RESTROOM", "THANK YOU VERY MUCH"];
+const demoSpeechToText = ["Hello, how can I help you?", "The weather is nice today.", "Let's go get some coffee."];
 
 function processTranslationResult(textResult) {
     const narrationText = document.getElementById('narration-text');
-    
+
     if (theirId === 'deaf') {
         playASLAnimation(textResult);
     } else if (theirId === 'blind' || theirId === 'hearing') {
         speakText(textResult);
     } else if (theirId === 'mute') {
         showTextOnScreen(textResult);
+    }
+}
+
+let lastVideoTime = -1;
+let recognizeLoop = null;
+
+function predictWebcam() {
+    const video = document.getElementById('camera-feed');
+    const narrationText = document.getElementById('narration-text');
+
+    if (video.currentTime !== lastVideoTime && gestureRecognizer && video.readyState >= 2) {
+        lastVideoTime = video.currentTime;
+        const results = gestureRecognizer.recognizeForVideo(video, Date.now());
+        if (results.gestures.length > 0) {
+            const categoryName = results.gestures[0][0].categoryName;
+            if (categoryName !== "None") {
+                narrationText.textContent = `Sign Detected: ${categoryName}`;
+                window.lastRecognizedGesture = categoryName;
+            }
+        }
+    }
+
+    if (isRecording) {
+        recognizeLoop = window.requestAnimationFrame(predictWebcam);
     }
 }
 
@@ -155,10 +214,16 @@ document.getElementById('action-btn').addEventListener('click', () => {
         btn.style.borderColor = 'var(--red)';
         document.querySelector('.action-ring').style.borderColor = 'var(--red)';
         document.querySelector('.action-ring-2').style.borderColor = 'rgba(232, 112, 96, 0.5)';
-        
+
         if (myId === 'deaf') {
-            narrationText.textContent = "Recording ASL... (Sign now)";
+            narrationText.textContent = "Recording Real ASL... (Show sign)";
             actionLabel.textContent = "Stop Recording";
+            window.lastRecognizedGesture = null;
+            if (gestureRecognizer) {
+                predictWebcam(); // Start ML loop
+            } else {
+                narrationText.textContent = "ML Model still loading, please wait...";
+            }
         } else if (myId === 'blind' || myId === 'hearing') {
             narrationText.textContent = "Listening to speech...";
             actionLabel.textContent = "Stop Listening";
@@ -182,15 +247,28 @@ document.getElementById('action-btn').addEventListener('click', () => {
         }
     } else {
         stopRecordingUI();
-        
+
         if (myId === 'deaf') {
             narrationText.textContent = "Translating ASL...";
             setTimeout(() => {
-                let textResult = demoASLToText[demoIdx % demoASLToText.length];
-                demoIdx++;
+                let rawSign = window.lastRecognizedGesture || "No sign detected";
+
+                // Map the ML output to human phrases
+                const gestureMap = {
+                    "Thumb_Up": "Good job! / Yes!",
+                    "Thumb_Down": "No / Bad",
+                    "Open_Palm": "Stop / Wait",
+                    "Closed_Fist": "Ready / Solid",
+                    "Pointing_Up": "Look up / Attention",
+                    "Victory": "Peace / Two",
+                    "ILoveYou": "I love you!"
+                };
+
+                let textResult = gestureMap[rawSign] || rawSign;
+
                 narrationText.textContent = "Translated ASL: " + textResult;
                 processTranslationResult(textResult);
-            }, 1000);
+            }, 500);
         } else if (myId === 'blind' || myId === 'hearing') {
             if (recognition) recognition.stop();
         }
@@ -210,7 +288,7 @@ function showTextOnScreen(text) {
     const textDisplayBlock = document.getElementById('text-display');
     const display = document.getElementById('display-text');
     const aslDisplay = document.getElementById('asl-display');
-    
+
     aslDisplay.innerHTML = '';
     textDisplayBlock.classList.remove('hidden');
     display.textContent = text;
@@ -228,10 +306,10 @@ function speakText(text) {
 document.getElementById('speak-typed-btn')?.addEventListener('click', () => {
     const txt = document.getElementById('type-input').value.trim();
     if (!txt) return;
-    
+
     document.getElementById('narration-text').textContent = "Typed: " + txt;
     processTranslationResult(txt);
-    
+
     document.getElementById('type-input').value = '';
 });
 
