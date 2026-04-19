@@ -91,8 +91,12 @@
 
         <!-- Status -->
         <div class="live-status">
+            <div id="pi-hardware-indicator" class="hidden" style="display: flex; align-items:center; gap: 8px; margin-right: 15px; padding-right: 15px; border-right: 1px solid rgba(255,255,255,0.1);">
+                <span style="color: var(--gold); font-size: 9px; letter-spacing: 1px;">PI HARDWARE BRIDGE</span>
+                <div class="status-dot" style="background: var(--gold); box-shadow: 0 0 10px var(--gold);"></div>
+            </div>
             <span class="status-dot"></span>
-            <span id="status-label">Phone Camera</span>
+            <span id="status-label">Camera Feed</span>
         </div>
     </section>
 <script src="config.js"></script>

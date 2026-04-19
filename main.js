@@ -10,8 +10,18 @@ function goTo(name) {
     window.location.href = name + (isLocal ? '.html' : '');
 }
 
-document.getElementById('use-phone-btn')?.addEventListener('click', () => goTo('identity1'));
-document.getElementById('use-pi-btn')?.addEventListener('click', () => goTo('identity1'));
+document.getElementById('use-phone-btn')?.addEventListener('click', () => {
+    localStorage.setItem('isPiMode', 'false');
+    goTo('identity1');
+});
+
+document.getElementById('use-pi-btn')?.addEventListener('click', () => {
+    localStorage.setItem('isPiMode', 'true');
+    // Auto-optimize for Pi: lower analysis rate to save CPU
+    localStorage.setItem('analysisInterval', '2.0');
+    localStorage.setItem('speechRate', '1.0');
+    goTo('identity1');
+});
 document.getElementById('learn-asl-btn')?.addEventListener('click', () => goTo('learn'));
 
 document.getElementById('id1-back-btn')?.addEventListener('click', () => goTo('setup'));
@@ -109,7 +119,7 @@ window.addEventListener('DOMContentLoaded', () => {
                         const rec = new SpeechRecognition();
                         // Play a tiny beep to indicate listening
                         if (navigator.vibrate) navigator.vibrate(100);
-                        
+
                         rec.onresult = (e) => {
                             const spoken = e.results[0][0].transcript.toLowerCase();
                             let detectedId = null;
@@ -117,7 +127,7 @@ window.addEventListener('DOMContentLoaded', () => {
                             else if (spoken.includes('deaf') || spoken.includes('sign')) detectedId = 'deaf';
                             else if (spoken.includes('mute') || spoken.includes('type')) detectedId = 'mute';
                             else if (spoken.includes('blind')) detectedId = 'blind';
-                            
+
                             if (detectedId) {
                                 window.speechSynthesis.speak(new SpeechSynthesisUtterance(`Selected ${detectedId}. Starting bridge.`));
                                 localStorage.setItem('theirId', detectedId);
@@ -153,8 +163,20 @@ function needsCamera() {
 }
 
 function setupUniversalMode() {
-    document.getElementById('type-input-area').classList.add('hidden');
-    document.getElementById('text-display').classList.add('hidden');
+    const isPi = localStorage.getItem('isPiMode') === 'true';
+    const statusLabel = document.getElementById('status-label');
+    const piIndicator = document.getElementById('pi-hardware-indicator');
+
+    if (isPi) {
+        if (statusLabel) statusLabel.textContent = "Pi Camera (V2)";
+        if (piIndicator) piIndicator.classList.remove('hidden');
+    } else {
+        if (statusLabel) statusLabel.textContent = "Phone Camera";
+        if (piIndicator) piIndicator.classList.add('hidden');
+    }
+
+    document.getElementById('type-input-area')?.classList.add('hidden');
+    document.getElementById('text-display')?.classList.add('hidden');
 
     if (myId === 'mute') {
         document.getElementById('type-input-area').classList.remove('hidden');
@@ -288,7 +310,7 @@ async function addPunctuationViaGroq(rawText) {
                 model: "llama-3.1-8b-instant",
                 messages: [{
                     role: "system",
-                    content: "You are an assistant that adds correct punctuation and capitalization to raw transcribed speech or sign language outputs. ONLY output the corrected text. Do not add any conversational filler like 'Here is the text'."
+                    content: "You are a literal transcription-to-text bridge. Your ONLY job is to add punctuation and capitalization to the input. NEVER answer questions. NEVER respond to the user. NEVER add new information. If the input is 'How are you', your output MUST be 'How are you?'. Do not be an assistant; be a filter."
                 }, {
                     role: "user",
                     content: rawText
@@ -332,11 +354,19 @@ async function processTranslationResult(textResult) {
 let lastVideoTime = -1;
 let recognizeLoop = null;
 
+let lastAnalyzeTS = 0;
 function predictWebcam() {
     const video = document.getElementById('camera-feed');
     const narrationText = document.getElementById('narration-text');
+    const isPi = localStorage.getItem('isPiMode') === 'true';
+    const now = Date.now();
 
-    if (video.currentTime !== lastVideoTime && gestureRecognizer && video.readyState >= 2) {
+    const userInterval = parseFloat(localStorage.getItem('analysisInterval') || '0.2') * 1000;
+
+    const threshold = isPi ? Math.max(userInterval, 400) : userInterval;
+
+    if (now - lastAnalyzeTS > threshold && video.currentTime !== lastVideoTime && gestureRecognizer && video.readyState >= 2) {
+        lastAnalyzeTS = now;
         lastVideoTime = video.currentTime;
         const results = gestureRecognizer.recognizeForVideo(video, Date.now());
         if (results.gestures.length > 0) {
@@ -449,6 +479,8 @@ function showTextOnScreen(text) {
 function speakText(text) {
     if ('speechSynthesis' in window) {
         const u = new SpeechSynthesisUtterance(text);
+        const rate = localStorage.getItem('speechRate') || '1.0';
+        u.rate = parseFloat(rate);
         window.speechSynthesis.speak(u);
     }
 }
@@ -464,12 +496,91 @@ document.getElementById('speak-typed-btn')?.addEventListener('click', () => {
     document.getElementById('type-input').value = '';
 });
 
-// Settings sliders
+// Settings logic: Save to localStorage and apply
 document.getElementById('analysis-interval')?.addEventListener('input', function () {
-    document.getElementById('interval-value').textContent = this.value + 's';
+    const val = this.value;
+    document.getElementById('interval-value').textContent = val + 's';
+    localStorage.setItem('analysisInterval', val);
 });
+
 document.getElementById('speech-rate')?.addEventListener('input', function () {
-    document.getElementById('rate-value').textContent = parseFloat(this.value).toFixed(1) + '×';
+    const val = parseFloat(this.value).toFixed(1);
+    document.getElementById('rate-value').textContent = val + '×';
+    localStorage.setItem('speechRate', val);
+});
+
+function syncSettingsUI() {
+    const interval = localStorage.getItem('analysisInterval') || '0.2';
+    const rate = localStorage.getItem('speechRate') || '1.0';
+
+    const intervalSlider = document.getElementById('analysis-interval');
+    const rateSlider = document.getElementById('speech-rate');
+
+    if (intervalSlider) {
+        intervalSlider.value = interval;
+        const valEl = document.getElementById('interval-value');
+        if (valEl) valEl.textContent = interval + 's';
+    }
+    if (rateSlider) {
+        rateSlider.value = rate;
+        const valEl = document.getElementById('rate-value');
+        if (valEl) valEl.textContent = rate + '×';
+    }
+}
+
+// Initialize logic for current page
+window.addEventListener('DOMContentLoaded', () => {
+    syncSettingsUI();
+    const path = window.location.pathname;
+
+    if (path.includes('identity2') && myId === 'blind') {
+        // Blind user Voice Assistant for selecting the second person
+        if ('speechSynthesis' in window) {
+            setTimeout(() => {
+                const utterance = new SpeechSynthesisUtterance("Who are you talking to? Please say Hearing, Deaf, Mute, or Blind.");
+                utterance.onend = () => {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    if (SpeechRecognition) {
+                        const rec = new SpeechRecognition();
+                        // Play a tiny beep to indicate listening
+                        if (navigator.vibrate) navigator.vibrate(100);
+
+                        rec.onresult = (e) => {
+                            const spoken = e.results[0][0].transcript.toLowerCase();
+                            let detectedId = null;
+                            if (spoken.includes('hearing') || spoken.includes('speak')) detectedId = 'hearing';
+                            else if (spoken.includes('deaf') || spoken.includes('sign')) detectedId = 'deaf';
+                            else if (spoken.includes('mute') || spoken.includes('type')) detectedId = 'mute';
+                            else if (spoken.includes('blind')) detectedId = 'blind';
+
+                            if (detectedId) {
+                                window.speechSynthesis.speak(new SpeechSynthesisUtterance(`Selected ${detectedId}. Starting bridge.`));
+                                localStorage.setItem('theirId', detectedId);
+                                setTimeout(() => goTo('live'), 2000);
+                            } else {
+                                window.speechSynthesis.speak(new SpeechSynthesisUtterance("I didn't catch that. Please reload the page to try again."));
+                            }
+                        };
+                        rec.onerror = () => {
+                            window.speechSynthesis.speak(new SpeechSynthesisUtterance("Could not hear you."));
+                        };
+                        rec.start();
+                    }
+                };
+                window.speechSynthesis.speak(utterance);
+            }, 500);
+        }
+    } else if (path.includes('live')) {
+        setupUniversalMode();
+        if (needsCamera()) {
+            startCamera();
+        } else {
+            const feed = document.getElementById('camera-feed');
+            if (feed) feed.srcObject = null;
+        }
+    } else if (path.includes('learn')) {
+        startLearnMode();
+    }
 });
 
 // --- Education Hack: Interactive ASL Tutor ---
