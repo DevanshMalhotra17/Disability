@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SightLine — Communication Bridge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+    <!-- SCREEN 1: SETUP -->
+    <section id="screen-setup" class="screen active">
+        <div class="grain"></div>
+
+        <header class="sl-header">
+            <div class="sl-logo">
+                <svg class="sl-logo-eye" width="28" height="18" viewBox="0 0 28 18" fill="none">
+                    <path d="M1 9C5 2 10 0 14 0C18 0 23 2 27 9C23 16 18 18 14 18C10 18 5 16 1 9Z" stroke="currentColor"
+                        stroke-width="1.2" fill="none" />
+                    <circle cx="14" cy="9" r="3.5" stroke="currentColor" stroke-width="1.2" fill="none" />
+                    <circle cx="14" cy="9" r="1.2" fill="currentColor" />
+                </svg>
+                <span class="sl-logo-text">SightLine</span>
+            </div>
+            <span class="sl-version">v2.1</span>
+        </header>
+
+        <main class="setup-main">
+            <div class="setup-hero">
+                <div class="hero-tag">Accessibility Bridge</div>
+                <h1 class="hero-headline">
+                    Every voice<br />
+                    <em>deserves</em> to<br />
+                    be heard.
+                </h1>
+                <p class="hero-sub">
+                    Real-time translation between sign language,<br />
+                    speech, and text. Connect with anyone.
+                </p>
+            </div>
+
+            <div class="setup-card">
+                <p class="card-question">Do you have the SightLine handheld device?</p>
+                <div class="card-choices">
+                    <button class="choice-btn choice-secondary" id="use-pi-btn">
+                        <div class="choice-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5">
+                                <rect x="5" y="2" width="14" height="20" rx="2" />
+                                <line x1="12" y1="18" x2="12" y2="18.01" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div class="choice-text">
+                            <span class="choice-label">Connect Pi</span>
+                            <span class="choice-desc">Use handheld hardware</span>
+                        </div>
+                        <span class="choice-arrow">↗</span>
+                    </button>
+
+                    <button class="choice-btn choice-primary" id="use-phone-btn">
+                        <div class="choice-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </div>
+                        <div class="choice-text">
+                            <span class="choice-label">Use This Phone</span>
+                            <span class="choice-desc">Camera &amp; mic on device</span>
+                        </div>
+                        <span class="choice-arrow">↗</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="setup-footnote">
+                <span class="footnote-pill">ASL</span>
+                <span class="footnote-pill">Speech-to-Text</span>
+                <span class="footnote-pill">Scene Description</span>
+                <span class="footnote-pill">Text-to-Speech</span>
+            </div>
+        </main>
+    </section>
+
+    <!-- SCREEN 2: MODE SELECT -->
+    <section id="screen-mode" class="screen">
+        <div class="grain"></div>
+
+        <header class="sl-header">
+            <button class="back-btn" id="mode-back-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                Back
+            </button>
+            <div class="sl-logo">
+                <svg class="sl-logo-eye" width="22" height="14" viewBox="0 0 28 18" fill="none">
+                    <path d="M1 9C5 2 10 0 14 0C18 0 23 2 27 9C23 16 18 18 14 18C10 18 5 16 1 9Z" stroke="currentColor"
+                        stroke-width="1.2" fill="none" />
+                    <circle cx="14" cy="9" r="3.5" stroke="currentColor" stroke-width="1.2" fill="none" />
+                    <circle cx="14" cy="9" r="1.2" fill="currentColor" />
+                </svg>
+                <span class="sl-logo-text">SightLine</span>
+            </div>
+        </header>
+
+        <main class="mode-main">
+            <div class="mode-heading">
+                <span class="mode-step">01 / Setup</span>
+                <h2 class="mode-title">Who are you<br />talking to?</h2>
+            </div>
+
+            <div class="mode-list">
+                <button class="mode-item" data-mode="deaf" id="mode-deaf">
+                    <div class="mode-num">01</div>
+                    <div class="mode-glyph">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0"/>
+                            <path d="M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4"/>
+                        </svg>
+                    </div>
+                    <div class="mode-info">
+                        <h3 class="mode-name">Deaf Person</h3>
+                        <p class="mode-desc">Sign language → speech. Your voice → on-screen text.</p>
+                    </div>
+                    <div class="mode-tag">ASL</div>
+                </button>
+
+                <button class="mode-item" data-mode="mute" id="mode-mute">
+                    <div class="mode-num">02</div>
+                    <div class="mode-glyph">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="4" width="20" height="16" rx="2" ry="2"/>
+                            <path d="M6 8h.01"/><path d="M10 8h.01"/><path d="M14 8h.01"/><path d="M18 8h.01"/><path d="M8 12h.01"/><path d="M12 12h.01"/><path d="M16 12h.01"/><path d="M7 16h10"/>
+                        </svg>
+                    </div>
+                    <div class="mode-info">
+                        <h3 class="mode-name">Mute Person</h3>
+                        <p class="mode-desc">They type, you hear. You speak, they read.</p>
+                    </div>
+                    <div class="mode-tag">Text</div>
+                </button>
+
+                <button class="mode-item" data-mode="blind" id="mode-blind">
+                    <div class="mode-num">03</div>
+                    <div class="mode-glyph">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </div>
+                    <div class="mode-info">
+                        <h3 class="mode-name">Blind Person</h3>
+                        <p class="mode-desc">Camera describes surroundings and reads text aloud.</p>
+                    </div>
+                    <div class="mode-tag">Scene</div>
+                </button>
+            </div>
+        </main>
+    </section>
+
+    <!-- SCREEN 3: LIVE BRIDGE -->
+    <section id="screen-live" class="screen">
+        <video id="camera-feed" autoplay playsinline muted></video>
+        <canvas id="capture-canvas" style="display:none;"></canvas>
+
+        <!-- Dark overlay gradient -->
+        <div class="live-overlay"></div>
+
+        <!-- Top bar -->
+        <div class="live-top">
+            <button class="live-back-btn" id="live-back-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+            </button>
+
+            <div class="live-mode-badge">
+                <span class="live-mode-dot"></span>
+                <span id="mode-label" class="live-mode-text">DEAF MODE</span>
+            </div>
+
+            <button class="live-settings-btn" id="settings-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="12" cy="12" r="3" />
+                    <path
+                        d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Scan corners -->
+        <div class="scan-frame">
+            <span class="sf-corner sf-tl"></span>
+            <span class="sf-corner sf-tr"></span>
+            <span class="sf-corner sf-bl"></span>
+            <span class="sf-corner sf-br"></span>
+        </div>
+
+        <!-- Translation output -->
+        <div id="narration-bar" class="narration-bar" aria-live="polite">
+            <span class="nb-label">Translation</span>
+            <p id="narration-text" class="nb-text">Ready to translate...</p>
+        </div>
+
+        <!-- Large display for deaf/mute to read -->
+        <div id="text-display" class="text-display hidden" aria-live="polite">
+            <p id="display-text" class="display-text"></p>
+        </div>
+
+        <!-- Type input for mute -->
+        <div id="type-input-area" class="type-input-area hidden">
+            <textarea id="type-input" class="type-input" placeholder="Type your message here…" rows="2"></textarea>
+            <button id="speak-typed-btn" class="speak-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                </svg>
+                Speak
+            </button>
+        </div>
+
+        <!-- Central action -->
+        <div class="live-bottom">
+            <button id="action-btn" class="action-btn">
+                <div class="action-ring"></div>
+                <div class="action-ring action-ring-2"></div>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <circle cx="12" cy="12" r="3" />
+                </svg>
+            </button>
+            <span class="action-label">Capture</span>
+        </div>
+
+        <!-- Status -->
+        <div class="live-status">
+            <span class="status-dot"></span>
+            <span id="status-label">Phone Camera</span>
+        </div>
+    </section>
+
+    <!-- SCREEN 4: SETTINGS -->
+    <section id="screen-settings" class="screen">
+        <div class="grain"></div>
+
+        <header class="sl-header">
+            <button class="back-btn" id="settings-back-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                Back
+            </button>
+            <span class="sl-header-title">Settings</span>
+        </header>
+
+        <main class="settings-main">
+            <div class="settings-section">
+                <span class="settings-section-label">Translation</span>
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <span class="settings-row-name">Auto-capture interval</span>
+                        <span id="interval-value" class="settings-row-val">3s</span>
+                    </div>
+                    <input type="range" id="analysis-interval" class="sl-range" min="1" max="10" value="3" step="1" />
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <span class="settings-section-label">Voice Output</span>
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <span class="settings-row-name">Speech rate</span>
+                        <span id="rate-value" class="settings-row-val">1.0×</span>
+                    </div>
+                    <input type="range" id="speech-rate" class="sl-range" min="0.5" max="2.5" value="1.0" step="0.1" />
+                </div>
+                <div class="settings-row">
+                    <span class="settings-row-name">Voice</span>
+                    <select id="voice-select" class="sl-select">
+                        <option value="">System default</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <span class="settings-section-label">Hardware</span>
+                <div class="settings-row">
+                    <span class="settings-row-name">Raspberry Pi</span>
+                    <button class="sl-btn-outline" id="pi-connect-btn">Connect via Bluetooth</button>
+                </div>
+            </div>
+
+            <div class="settings-about">
+                <div class="about-logo">
+                    <svg class="sl-logo-eye" width="32" height="20" viewBox="0 0 28 18" fill="none">
+                        <path d="M1 9C5 2 10 0 14 0C18 0 23 2 27 9C23 16 18 18 14 18C10 18 5 16 1 9Z"
+                            stroke="currentColor" stroke-width="1.2" fill="none" />
+                        <circle cx="14" cy="9" r="3.5" stroke="currentColor" stroke-width="1.2" fill="none" />
+                        <circle cx="14" cy="9" r="1.2" fill="currentColor" />
+                    </svg>
+                    SightLine
+                </div>
+                <p class="about-text">Version 2.1.0 · Communication Bridge</p>
+            </div>
+        </main>
+    </section>
+
+    <script>
+        // ─── Navigation ───────────────────────────────────────────────
+        const screens = {
+            setup: document.getElementById('screen-setup'),
+            mode: document.getElementById('screen-mode'),
+            live: document.getElementById('screen-live'),
+            settings: document.getElementById('screen-settings'),
+        };
+        let prevScreen = 'mode';
+
+        function goTo(name) {
+            Object.values(screens).forEach(s => s.classList.remove('active'));
+            screens[name].classList.add('active');
+        }
+
+        document.getElementById('use-phone-btn').addEventListener('click', () => goTo('mode'));
+        document.getElementById('use-pi-btn').addEventListener('click', () => goTo('mode'));
+        document.getElementById('mode-back-btn').addEventListener('click', () => goTo('setup'));
+        document.getElementById('live-back-btn').addEventListener('click', () => goTo('mode'));
+        document.getElementById('settings-btn').addEventListener('click', () => { prevScreen = 'live'; goTo('settings'); });
+        document.getElementById('settings-back-btn').addEventListener('click', () => goTo(prevScreen));
+
+        // Mode cards
+        let currentMode = 'deaf';
+        document.querySelectorAll('.mode-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentMode = btn.dataset.mode;
+                document.getElementById('mode-label').textContent = currentMode.toUpperCase() + ' MODE';
+                setupMode(currentMode);
+                goTo('live');
+                startCamera();
+            });
+        });
+
+        // ─── Mode UI ─────────────────────────────────────────────────
+        function setupMode(mode) {
+            document.getElementById('type-input-area').classList.add('hidden');
+            document.getElementById('text-display').classList.add('hidden');
+            if (mode === 'mute') document.getElementById('type-input-area').classList.remove('hidden');
+        }
+
+        // ─── Camera ───────────────────────────────────────────────────
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+                document.getElementById('camera-feed').srcObject = stream;
+            } catch (e) { console.warn('Camera unavailable', e); }
+        }
+
+        // ─── Action button (demo) ─────────────────────────────────────
+        const msgs = {
+            deaf: ["Signing: 'Hello, how are you?'", "Signing: 'My name is Alex'", "Signing: 'Thank you very much'"],
+            mute: ["Ready for typed input.", "Message sent.", "Listening…"],
+            blind: ["Clear sidewalk ahead, street sign reads 'Main St'.", "Text detected: 'Push to open'", "Three steps leading down on your right."],
+        };
+        let msgIdx = 0;
+
+        document.getElementById('action-btn').addEventListener('click', () => {
+            const list = msgs[currentMode] || msgs.deaf;
+            document.getElementById('narration-text').textContent = list[msgIdx % list.length];
+            msgIdx++;
+        });
+
+        // ─── Speak typed ─────────────────────────────────────────────
+        document.getElementById('speak-typed-btn')?.addEventListener('click', () => {
+            const txt = document.getElementById('type-input').value.trim();
+            if (!txt) return;
+            if ('speechSynthesis' in window) {
+                const u = new SpeechSynthesisUtterance(txt);
+                window.speechSynthesis.speak(u);
+            }
+        });
+
+        // ─── Settings sliders ─────────────────────────────────────────
+        document.getElementById('analysis-interval').addEventListener('input', function () {
+            document.getElementById('interval-value').textContent = this.value + 's';
+        });
+        document.getElementById('speech-rate').addEventListener('input', function () {
+            document.getElementById('rate-value').textContent = parseFloat(this.value).toFixed(1) + '×';
+        });
+    </script>
+</body>
+
+</html>
